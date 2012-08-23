@@ -1,12 +1,16 @@
+#include <GL/glew.h>
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>          /* Open GL Util    APPLE */
 #else
 #include <GL/glut.h>            /* Open GL Util    OpenGL*/
 #endif
 
+#include <iostream>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-void display() {
+static void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     
@@ -43,25 +47,59 @@ void display() {
     glutSwapBuffers();
 }
 
-void idle(void) {
-    
-}
-
-void timer(int value) {
+static void timer(int value) {
     glutPostRedisplay();
     glutTimerFunc(1000.0f / 60.0f, timer, 0);
 }
 
-/* Set up everything, and start the GLUT main loop. */
+static void idle(void) {
+}
+
+static void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+        case 27:
+            exit(0);
+            break;
+        default:
+            break;
+    }
+}
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(300, 200);
-    glutCreateWindow("Hello World!");
+    glutCreateWindow("Hello World!");  {
+        GLenum err = glewInit();
+        if (GLEW_OK != err) {
+            fprintf(stderr, "Error initializing GLEW: %s\n", glewGetErrorString(err));
+            return EXIT_FAILURE;
+        }
+        printf("GLEW Version            : %s\n", glewGetString(GLEW_VERSION));
+    }
+    {
+        const GLubyte *renderer = glGetString(GL_RENDERER);
+        const GLubyte *vendor = glGetString(GL_VENDOR);
+        const GLubyte *version = glGetString(GL_VERSION);
+        const GLubyte *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+        GLint major, minor;
+        glGetIntegerv(GL_MAJOR_VERSION, &major);
+        glGetIntegerv(GL_MINOR_VERSION, &minor);
+        printf("GLSL Version            : %s\n", glslVersion);
+        printf("GL Vendor               : %s\n", vendor);
+        printf("GL Renderer             : %s\n", renderer);
+        printf("GL Version (string)     : %s\n", version);
+        printf("GL Version (integer)    : %d.%d\n", major, minor);
+    }
+    {
+        const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+        printf("GL Extensions           : %s\n", extensions);
+    }
+
     glutDisplayFunc(display);
     glutIdleFunc(idle);
+    glutKeyboardFunc(keyboard);
     glutTimerFunc(1000.0f / 60.0f, timer, 0);
     glutMainLoop();
-    return 0;
 } /* end func main */
