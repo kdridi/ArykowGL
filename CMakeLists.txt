@@ -6,12 +6,13 @@ set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
  
 find_package (OpenGL REQUIRED)
 find_package (GLUT REQUIRED)
+find_package (Boost REQUIRED)
 
 include_directories (
-  headers
-  glm
+  /usr/local/include
   ${OPENGL_INCLUDE_DIR}
   ${GLUT_INCLUDE_DIR}
+  ${BOOST_INCLUDE_DIR}
 )
  
 file(
@@ -29,4 +30,5 @@ target_link_libraries (
   Cube3D
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARY}
+  ${BOOST_LIBRARY}
 )
